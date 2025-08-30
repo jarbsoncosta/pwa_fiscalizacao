@@ -8,7 +8,7 @@ import { ButtonComponent } from "../../../../components/Button/Button";
 import { AiOutlineClear } from "react-icons/ai";
 
 export function TargetTable({ onSelectionChange }) {
-  const { targets, filters: contextFilters, setFilters, loading, fetchTargets } = useContext(DataContext);
+  const { targets, filters: contextFilters, setFilters, loading } = useContext(DataContext);
   const navigate = useNavigate();
 
   const [selectedTargetIds, setSelectedTargetIds] = useState([]);
@@ -57,21 +57,11 @@ export function TargetTable({ onSelectionChange }) {
     );
   };
 
-  const handleOpenMap = () => {
-    sessionStorage.setItem("userTargets", JSON.stringify(targets));
-    navigate("/view/meus_alvos/mapa");
-  };
 
   const handleView = (target) => {
     // Ex: navegar para /alvos/123
     console.log("Ver detalhes:", target);
     // navigate(`/alvos/${target.id}`);
-  };
-
-  const handleOpenInMap = (target) => {
-    const userTargets = [target];
-    sessionStorage.setItem("userTargets", JSON.stringify(userTargets));
-    navigate("/view/meus_alvos/mapa");
   };
 
   const handleReallocate = (target) => {
@@ -90,7 +80,7 @@ export function TargetTable({ onSelectionChange }) {
   return (
     <div className={styles.container}>
       {/* Botão para abrir mapa */}
-      <div className={styles.header}>
+{/*       <div className={styles.header}>
 
         <div className={styles.filterGroup}>
           <ButtonComponent
@@ -101,18 +91,12 @@ export function TargetTable({ onSelectionChange }) {
             }}
 
           >
-            <AiOutlineClear size={20} />
+            <AiOutlineClear size={18} />
             Limpar
           </ButtonComponent>
         </div>
-        <ButtonComponent
-          variant="blue"
-          onClick={handleOpenMap}
-          icon={<FiMapPin size={18} />}
-        >
-          Ver no Mapa
-        </ButtonComponent>
-      </div>
+ 
+      </div> */}
 
       {/* Filtros */}
       <div className={styles.filters}>

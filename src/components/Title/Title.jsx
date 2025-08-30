@@ -1,6 +1,6 @@
 "use client";
 import { ButtonComponent } from "../Button/Button";
-import styles from "./DashboardHeader.module.css";
+import styles from "./Title.module.css";
 
 
 // Mapeamento de cores para o ButtonComponent
@@ -11,7 +11,7 @@ const colorClasses = {
   gray: "border-gray-600 text-gray-600 hover:bg-gray-50",
 };
 
-export default function DashboardHeader({ title, subtitle, actions = [] }) {
+export default function Title({ title, subtitle, actions = [] }) {
   return (
     <header className={styles.header}>
       {/* Título e Subtítulo */}

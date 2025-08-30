@@ -1,103 +1,123 @@
 "use client";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { FaLayerGroup, FaSync } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom"; // ✅ react-router-dom
+import { FaLayerGroup } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import styles from "./Dashboard.module.css";
 import Card from "../../components/Card/Card";
 import { CardEquip } from "../../components/CardEquip/CardEquip";
 import { FormCreateTeam } from "../../components/FormCreateTeam/FormCreateTeam";
 import { Modal } from "../../components/Modal/Modal";
-import DashboardHeader from "../../components/Title/Title";
+import Title from "../../components/Title/Title";
 import { DataContext } from "../../context/DataContext";
 import { formatDateBR } from "../../utils/formatDate";
 import { LuTarget } from "react-icons/lu";
 import { IoCheckmark, IoPause, IoTime } from "react-icons/io5";
 
-export default function Dashboard () {
+export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { targets, teams, fetchTeams } = useContext(DataContext);
 
-  function filtrarComTargets(dados) {
-    return dados.filter(item => item.targets && item.targets.length > 0);
-  }
-  
-  const filtrados = filtrarComTargets(teams);
+  // ✅ usar query string com react-router
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("q") || "");
 
-  // Contagem de status usando useMemo
-  const { nao_iniciado, em_andamento, concluida, outros } = useMemo(() => {
+  // Atualiza query string e estado
+  const handleSearch = (value) => {
+    setSearch(value);
+    if (value) {
+      setSearchParams({ q: value });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  useEffect(() => {
+    fetchTeams();
+  }, []);
+
+  // Contagem de status
+  const { nao_iniciado, em_andamento, concluida } = useMemo(() => {
     return targets.reduce(
       (acc, t) => {
         const status = t.status?.toUpperCase();
         if (status === "NÃO INICIADA") acc.nao_iniciado += 1;
         else if (status === "EM ANDAMENTO") acc.em_andamento += 1;
         else if (status === "CONCLUÍDA") acc.concluida += 1;
-        else acc.outros += 1;
         return acc;
       },
-      { nao_iniciado: 0, em_andamento: 0, concluida: 0, outros: 0 }
+      { nao_iniciado: 0, em_andamento: 0, concluida: 0 }
     );
   }, [targets]);
 
-  // const [teams, setTeams] = useState([]);
-  // const [loading, setLoading] = useState(true);
+  // 🔎 filtro por nome da equipe ou membro
+  const filteredTeams = useMemo(() => {
+    if (!search) return teams;
 
-  // const fetchTeams = async () => {
-  //   try {
-  //     const response = await api.get("/team");
-  //     setTeams(response.data);
-  //   } catch (error) {
-  //     console.error("Erro ao buscar equipes:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+    return teams.filter((team) => {
+      const teamNameMatch = team.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
-  useEffect(() => {
-    fetchTeams();
-  }, []);
+      const userNameMatch = team.users?.some((user) =>
+        user.name.toLowerCase().includes(search.toLowerCase())
+      );
 
-  const refreshData = () => {
-    window.location.reload();
-  };
+      return teamNameMatch || userNameMatch;
+    });
+  }, [teams, search]);
 
   const handleTeamCreated = () => {
-    fetchTeams(); // Atualiza a lista de equipes
+    fetchTeams();
   };
-
-  // if (loading) {
-  //   return <p className="p-6 text-gray-600">Carregando equipes...</p>;
-  // }
 
   return (
     <main>
       {/* Seção de Estatísticas */}
       <div className={styles.headerContainer}>
-        <DashboardHeader
+        <Title
           title="Dashboard de Fiscalização"
           subtitle="Acompanhe o progresso das fiscalizações em tempo real"
-          actions={[
-            {
-              label: "Atualizar",
-              icon: <FaSync size={20} />,
-              onClick: refreshData,
-              color: "green",
-            },
-          ]}
         />
       </div>
 
       <div className={styles.statsGrid}>
-      <Card  value={targets.length} label="Total de Fiscalização" color="blue" icon={<LuTarget />} />
-      <Card  value={concluida}  label="Concluídas" color="green" icon={<IoCheckmark />} />
-      <Card value={em_andamento} label="Em Andamento" color="yellow" icon={<IoTime />} />
-      <Card value={nao_iniciado} label="Não Iniciada" color="gray" icon={<IoPause/>} />
-      <Card value={filtrados.length} label="Equipes Ativas" color="sky" icon={<FaLayerGroup />} />
+        <Card
+          value={targets.length}
+          label="Total de Fiscalização"
+          color="blue"
+          icon={<LuTarget />}
+        />
+        <Card
+          value={concluida}
+          label="Concluídas"
+          color="green"
+          icon={<IoCheckmark />}
+        />
+        <Card
+          value={em_andamento}
+          label="Em Andamento"
+          color="yellow"
+          icon={<IoTime />}
+        />
+        <Card
+          value={nao_iniciado}
+          label="Não Iniciada"
+          color="gray"
+          icon={<IoPause />}
+        />
+        <Card
+          value={teams.length}
+          label="Equipes Ativas"
+          color="sky"
+          icon={<FaLayerGroup />}
+        />
       </div>
 
       {/* Seção de Equipes */}
       <div className={styles.headerContainer}>
-        <DashboardHeader
-          title="Equipes"          
+        <Title
+          title="Equipes"
           actions={[
             {
               label: "Nova Equipe",
@@ -109,11 +129,26 @@ export default function Dashboard () {
         />
       </div>
 
+      {/* 🔎 Campo de pesquisa */}
+      <div className={styles.filters}>   
+
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Equipe ou Membro</label>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="72624476"
+            className={styles.filterInput}
+          />
+        </div>
+      </div>
+
       <div className={styles.teamsGrid}>
-        {teams.length === 0 ? (
+        {filteredTeams.length === 0 ? (
           <p className={styles.emptyState}>Nenhuma equipe encontrada.</p>
         ) : (
-          teams.map((team) => {
+          filteredTeams.map((team) => {
             const concluidos =
               team.targets?.filter(
                 (t) => t.status?.trim().toUpperCase() === "CONCLUÍDA"
@@ -149,4 +184,3 @@ export default function Dashboard () {
     </main>
   );
 }
-

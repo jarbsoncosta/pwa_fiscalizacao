@@ -1,5 +1,5 @@
 .container {
-    padding: 1.5rem;
+    padding: 1rem;
     max-width: 100%;
     margin: 0 auto;
     font-family: system-ui, -apple-system, sans-serif;
@@ -29,6 +29,15 @@
     font-weight: 700;
     color: #1f2937;
     margin-bottom: 0.5rem;
+  }
+
+  .info{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    label{
+      font-weight: 600;
+    }
   }
   
   .subtitle {
@@ -71,6 +80,15 @@
   @media (min-width: 768px) {
     .grid {
       grid-template-columns: repeat(2, 1fr);
+    }
+    .container{
+      padding: 0.5rem;
+    }
+  }
+
+  @media (min-width: 414px) {
+    .container{
+      padding: 0.5rem;
     }
   }
   

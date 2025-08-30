@@ -1,12 +1,9 @@
 .container {
     background-color: white;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
   }
-  
-  
+    
   .header {
     display: flex;
     justify-content: flex-end;
@@ -24,6 +21,7 @@
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+  
   
   @media (min-width: 768px) {
     .filters {
@@ -152,10 +150,7 @@
     font-size: 0.875rem;
   }
   
-  /* .assigned {
-    opacity: 0.6;
-  } */
-  
+ 
   .loadingRow,
   .emptyRow {
     text-align: center;

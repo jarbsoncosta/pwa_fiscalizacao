@@ -1,13 +1,23 @@
 import { FaBars, FaHome, FaList, FaTachometerAlt, FaTimes, FaUserCircle, FaUsers } from "react-icons/fa";
 import { RiMapPinUserFill } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import styles from "./Navbar.module.css";
+import { SiGooglemaps } from "react-icons/si";
+import { DataContext } from "../../context/DataContext";
+
 
 export default function Navbar() {
     const { user } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
+     const { targets} = useContext(DataContext);
+     const navigate = useNavigate();
+
+     const handleOpenMap = () => {
+      sessionStorage.setItem("userTargets", JSON.stringify(targets));
+      navigate("/view/meus_alvos/mapa");
+    };
   
     return (
       <nav className={styles.navbar}>
@@ -15,7 +25,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className={styles.logo}>
             {/* <img src="/logo.png" alt="Logo" style={{ height: "32px", width: "32px" }} /> */}
-            <span>Sistema de Fiscalização</span>
+            <span>SF</span>
           </div>
   
           {/* Menu Desktop */}
@@ -29,9 +39,9 @@ export default function Navbar() {
             <Link to="/view/meus_alvos" className={styles.navLink}>
               <RiMapPinUserFill size={20} /> Meus Alvos
             </Link>
-            {/* <Link to="/view/equipes" className={styles.navLink}>
-              <FaUsers /> Equipes
-            </Link> */}
+             <button type="button" onClick={handleOpenMap} className={styles.button}>
+              <SiGooglemaps /> Mapa
+            </button> 
             <Link to="/view/dashboard" className={styles.navLink}>
               <FaTachometerAlt /> Dashboard
             </Link>

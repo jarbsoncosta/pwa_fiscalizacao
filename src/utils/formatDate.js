@@ -13,4 +13,17 @@ export function formatDateBR(isoString) {
   
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   }
+
+  export function formatCNPJ(cnpj) {
+    if (!cnpj) return "";
+    
+    // Remove tudo que não for número
+    cnpj = cnpj.replace(/\D/g, "");
+  
+    // Aplica a máscara
+    return cnpj.replace(
+      /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+      "$1.$2.$3/$4-$5"
+    );
+  }
   

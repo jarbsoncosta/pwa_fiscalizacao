@@ -29,6 +29,21 @@
     align-items: center;
     font-size: 1.125rem;
   }
+
+  .button {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    font-size: 1.125rem;
+    cursor: pointer;
+    border: none;
+  
+  } 
   
   .navLink {
     display: flex;

@@ -5,15 +5,17 @@ import styles from "./TargetDetailPage.module.css";
 import { DataContext } from "../../context/DataContext";
 import { ButtonComponent } from "../../components/Button/Button";
 import { FiMapPin } from "react-icons/fi";
+import { formatCNPJ, formatDateBR } from "../../utils/formatDate";
 
 export default function TargetDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const { targets, loading: targetsLoading } = useContext(DataContext);
-
   const [target, setTarget] = useState(null);
   const [error, setError] = useState(null);
+
+  console.log(target, "Target")
 
   const handleOpenMap = () => {
     if (!target) return;
@@ -23,7 +25,6 @@ export default function TargetDetailPage() {
 
   useEffect(() => {
     if (targetsLoading) {
-      // evita sobrescrever erro enquanto carrega
       if (error !== null) setError(null);
       return;
     }
@@ -37,7 +38,6 @@ export default function TargetDetailPage() {
     const encontrado = targets.find((item) => String(item.id) === String(id));
 
     if (encontrado) {
-      // só atualiza se for diferente
       if (target?.id !== encontrado.id) setTarget(encontrado);
       if (error !== null) setError(null);
     } else {
@@ -57,10 +57,10 @@ export default function TargetDetailPage() {
       <button onClick={handleBack} className={styles.backButton}>
         ← Voltar
       </button>
-
       <h1 className={styles.title}>{target.nomeProprietario}</h1>
-      <p className={styles.subtitle}>CNPJ: {target.cnpj}</p>
+      <p className={styles.subtitle}>CNPJ:{formatCNPJ(target.cnpj)}</p>
 
+      {/* Card de informações */}
       <div className={styles.card}>
         <div className={styles.header}>
           <span className={styles.icon}></span>
@@ -68,31 +68,35 @@ export default function TargetDetailPage() {
         </div>
 
         <div className={styles.grid}>
-          <div style={{ display: "flex", flexDirection: "column", gap:"0.3rem" }}>
+          <div className={styles.info}>
             <label>Nome/Razão Social</label>
             <p>{target.nomeProprietario}</p>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap:"0.3rem" }}>
+          <div className={styles.info}>
             <label>CEP</label>
             <p>{target.cep}</p>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap:"0.3rem" }}>
+          <div className={styles.info}>
             <label>CNPJ</label>
-            <p>{target.cnpj}</p>
+            <p>{formatCNPJ(target.cnpj)}</p>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap:"0.3rem" }}>
+          <div className={styles.info}>
             <label>Endereço</label>
             <p>{target.enderecoObra}</p>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap:"0.3rem" }}>
+          <div className={styles.info}>
             <label>Data de Cadastro</label>
-            <p>{new Date().toLocaleDateString("pt-BR")}</p>
+            <p>
+              {target.createdAt
+                ? formatDateBR(target.createdAt)
+                : "-"}
+            </p>
           </div>
-          <div>
+          <div className={styles.info}>
             <label>Cidade</label>
             <p>{target.cidade}</p>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap:"0.3rem" }}>
+          <div className={styles.info}>
             <label>Status</label>
             <span
               className={`${styles.statusBadge} ${
@@ -118,6 +122,7 @@ export default function TargetDetailPage() {
         </div>
       </div>
 
+      {/* Card de resultados */}
       <div className={styles.card}>
         <div className={styles.header}>
           <span className={styles.icon}></span>
@@ -125,11 +130,11 @@ export default function TargetDetailPage() {
         </div>
 
         <div className={styles.grid}>
-          <div>
+          <div className={styles.info}>
             <label>Fiscalizador</label>
             <p>{target.fiscalizador}</p>
           </div>
-          <div>
+          <div className={styles.info}>
             <label>Data/Hora</label>
             <p>
               <strong>Início:</strong>{" "}
@@ -143,28 +148,31 @@ export default function TargetDetailPage() {
                 : "-"}
             </p>
           </div>
-          <div>
+          <div className={styles.info}>
             <label>Formulário Utilizado</label>
             <p>{target.formularioUtilizado}</p>
           </div>
-          <div>
+          <div className={styles.info}>
             <label>Anexos</label>
             <div className={styles.anexos}>
-              {target.anexos?.length ? (
-                target.anexos.map((file, index) => (
-                  <div key={index} className={styles.anexo}>
-                    <a
-                      href={file.url}
-                      download
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <span className={styles.downloadIcon}>⬇️</span>
-                      Baixar Arquivo
-                    </a>
-                    <span className={styles.fileName}>{file.name}</span>
-                  </div>
-                ))
+              {target.images?.length > 0 ? (
+                target.images.map((file, index) => {
+                  const filePath = typeof file === "string" ? file : file.url || "";
+                  const fileName =
+                    typeof file === "string"
+                      ? file.split("/").pop()
+                      : file.name || "arquivo";
+
+                  return (
+                    <div key={index} className={styles.anexo}>
+                      <a href={`/${filePath}`} rel="noopener noreferrer">
+                        <span className={styles.downloadIcon}> ⬇️ </span>
+                        Baixar Arquivo
+                      </a>
+                     {/*  <span className={styles.fileName}>{fileName}</span> */}
+                    </div>
+                  );
+                })
               ) : (
                 <span>Nenhum anexo</span>
               )}

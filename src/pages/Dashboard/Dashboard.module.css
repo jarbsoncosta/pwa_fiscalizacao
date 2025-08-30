@@ -1,0 +1,57 @@
+.container {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  
+  .headerContainer {
+    margin: 1.5rem 0;
+  }
+  
+  .statsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .statsGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .statsGrid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  .teamsHeader {
+    margin-top: 2rem;
+  }
+  
+  .teamsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  @media (min-width: 640px) {
+    .teamsGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .teamsGrid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .emptyState {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #6b7280; /* text-gray-500 */
+    font-style: italic;
+    padding: 1rem;
+  }

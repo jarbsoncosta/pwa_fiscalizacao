@@ -36,6 +36,8 @@ export default function Dashboard() {
     fetchTeams();
   }, []);
 
+  const equipesAtivas = teams.filter((item)=>item.users.length > 0 && item.targets.length > 0 )
+
   // Contagem de status
   const { nao_iniciado, em_andamento, concluida } = useMemo(() => {
     return targets.reduce(
@@ -107,7 +109,7 @@ export default function Dashboard() {
           icon={<IoPause />}
         />
         <Card
-          value={teams.length}
+          value={equipesAtivas.length}
           label="Equipes Ativas"
           color="sky"
           icon={<FaLayerGroup />}

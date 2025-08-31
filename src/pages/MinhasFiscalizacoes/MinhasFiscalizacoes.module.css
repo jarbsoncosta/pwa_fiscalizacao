@@ -21,8 +21,28 @@
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+
+  .statsGrid {
+    display: grid;
+    margin-top: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
   
+  @media (min-width: 768px) {
+    .statsGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
   
+  @media (min-width: 1024px) {
+    .statsGrid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+   
   @media (min-width: 768px) {
     .filters {
       grid-template-columns: repeat(2, 1fr);

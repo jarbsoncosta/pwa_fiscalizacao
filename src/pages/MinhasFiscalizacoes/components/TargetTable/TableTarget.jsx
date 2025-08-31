@@ -7,9 +7,11 @@ import { FiEye, FiRefreshCw } from "react-icons/fi";
 import { DataContext } from "../../../../context/DataContext";
 import { ButtonComponent } from "../../../../components/Button/Button";
 import { formatCNPJ } from "../../../../utils/formatDate";
+import { useAuth } from "../../../../context/AuthContext";
 
 export default function TableTarget() {
   const { userData } = useContext(DataContext);
+  const {user} = useAuth()
   const navigate = useNavigate();
   const [loading] = useState(false); // Simulando loading (pode vir do contexto)
 
@@ -20,8 +22,6 @@ export default function TableTarget() {
 
   // Extrai todos os targets das equipes do usuário
   const allTargets = userData[0]?.teams?.flatMap(team => team.targets) || [];
-
-  console.log(allTargets)
 
   const handleOpenMap = () => {
     // Salva os alvos no sessionStorage
@@ -66,6 +66,7 @@ export default function TableTarget() {
       <div className={styles.card}>
         {/* Botão para abrir mapa */}
         <div className={styles.header}>
+          <span>{`Bem-vindo, ${user?.name}! Você está na equipe ${userData[0]?.teams[0]?.name}`} </span>
           <ButtonComponent
             variant="blue"
             onClick={handleOpenMap}

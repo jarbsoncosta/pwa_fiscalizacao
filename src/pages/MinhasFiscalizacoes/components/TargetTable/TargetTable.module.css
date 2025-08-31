@@ -7,9 +7,31 @@
 
   .header {
     display: flex;
-    justify-content: flex-end;
+    gap: 1rem;
+    width: 100%;
+    justify-content: space-between;
     padding: 1rem;
     border-bottom: 1px solid #e5e7eb;
+
+    span{
+      display: flex;
+      width: 100%;
+      border: 1px solid #4ade80;
+      align-items: center;
+      border-radius: 5px;
+      background: #dcfce7;
+      padding: 0.5rem 1.5rem;
+      color: #15803d;
+    }
+   
+  }
+  @media (max-width: 768px) {
+    .header {
+      display: block;      
+    }
+    span{
+      margin: 1rem 0;
+    }
   }
   
   

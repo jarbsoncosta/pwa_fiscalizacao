@@ -57,7 +57,7 @@ export default function TargetDetailPage() {
       <button onClick={handleBack} className={styles.backButton}>
         ← Voltar
       </button>
-      <h1 className={styles.title}>{target.nomeProprietario}</h1>
+      <h1 className={styles.title}>{target?.empresa}</h1>
       <p className={styles.subtitle}>CNPJ:{formatCNPJ(target.cnpj)}</p>
 
       {/* Card de informações */}
@@ -69,7 +69,7 @@ export default function TargetDetailPage() {
 
         <div className={styles.grid}>
           <div className={styles.info}>
-            <label>Nome/Razão Social</label>
+            <label>Proprietário</label>
             <p>{target.nomeProprietario}</p>
           </div>
           <div className={styles.info}>
@@ -77,8 +77,8 @@ export default function TargetDetailPage() {
             <p>{target.cep}</p>
           </div>
           <div className={styles.info}>
-            <label>CNPJ</label>
-            <p>{formatCNPJ(target.cnpj)}</p>
+            <label>Profissional responsável</label>
+            <p>{target?.nomeProfissional}</p>
           </div>
           <div className={styles.info}>
             <label>Endereço</label>

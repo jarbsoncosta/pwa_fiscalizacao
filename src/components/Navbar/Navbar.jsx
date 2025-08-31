@@ -10,6 +10,8 @@ import { DataContext } from "../../context/DataContext";
 
 export default function Navbar() {
     const { user } = useAuth();
+
+    console.log(user)
     const [menuOpen, setMenuOpen] = useState(false);
      const { targets} = useContext(DataContext);
      const navigate = useNavigate();

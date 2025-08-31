@@ -6,6 +6,7 @@ import styles from "./TargetTable.module.css";
 import { DataContext } from "../../../../context/DataContext";
 import { ButtonComponent } from "../../../../components/Button/Button";
 import { AiOutlineClear } from "react-icons/ai";
+import { formatCNPJ } from "../../../../utils/formatDate";
 
 export function TargetTable({ onSelectionChange }) {
   const { targets, filters: contextFilters, setFilters, loading } = useContext(DataContext);
@@ -80,7 +81,7 @@ export function TargetTable({ onSelectionChange }) {
   return (
     <div className={styles.container}>
       {/* Botão para abrir mapa */}
-{/*       <div className={styles.header}>
+      {/*       <div className={styles.header}>
 
         <div className={styles.filterGroup}>
           <ButtonComponent
@@ -170,7 +171,9 @@ export function TargetTable({ onSelectionChange }) {
                 />
               </th>
               <th>ART</th>
+              <th>Empresa</th>
               <th>Proprietário</th>
+              <th>Profissional</th>
               <th>Endereço</th>
               <th>Status</th>
               <th>Equipe Atual</th>
@@ -216,8 +219,16 @@ export function TargetTable({ onSelectionChange }) {
                       </div>
                     </td>
                     <td>
+                      <div style={{ fontWeight: 500 }}>{target?.empresa}</div>
+                      <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{formatCNPJ(target?.cnpj)}</div>
+                    </td>
+                    <td>
                       <div style={{ fontWeight: 500 }}>{target.nomeProprietario}</div>
-                      <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{target.cnpj}</div>
+                      {/* <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{formatCNPJ(target?.cnpj)}</div> */}
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 500 }}>{target.nomeProfissional}</div>
+                      {/* <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{formatCNPJ(target?.cnpj)}</div> */}
                     </td>
                     <td>{target.enderecoObra}</td>
                     <td>

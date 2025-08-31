@@ -75,9 +75,9 @@ export default function Navbar() {
             <Link to="/view/meus_alvos" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
               <RiMapPinUserFill /> Meus Alvos
             </Link>
-            {/* <Link to="/equipes" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-              <FaUsers /> Equipes
-            </Link> */}
+            <button type="button" onClick={handleOpenMap} className={styles.button}>
+              <SiGooglemaps /> Mapa
+            </button> 
             <Link to="/view/dashboard" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
               <FaTachometerAlt /> Dashboard
             </Link>

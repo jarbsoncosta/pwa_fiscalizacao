@@ -17,7 +17,7 @@ const Login = () => {
     try {
       await login(username, password);
       // Após login bem-sucedido, redirecione (ex: para dashboard)
-      navigate('/view/dashboard'); // Ajuste conforme sua rota
+      navigate('/view/meus_alvos'); // Ajuste conforme sua rota
     } catch (err) {
       // Erro já é tratado no contexto, mas pode ser logado
       console.error('Falha no login:', err);

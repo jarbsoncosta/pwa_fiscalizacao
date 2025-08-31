@@ -1,16 +1,14 @@
 "use client";
 import { useState, useContext, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { FiEye, FiMapPin, FiRefreshCw } from "react-icons/fi";
+import { NavLink  } from "react-router-dom";
+import { FiEye, FiRefreshCw } from "react-icons/fi";
 import styles from "./TargetTable.module.css";
 import { DataContext } from "../../../../context/DataContext";
-import { ButtonComponent } from "../../../../components/Button/Button";
-import { AiOutlineClear } from "react-icons/ai";
+
 import { formatCNPJ } from "../../../../utils/formatDate";
 
 export function TargetTable({ onSelectionChange }) {
   const { targets, filters: contextFilters, setFilters, loading } = useContext(DataContext);
-  const navigate = useNavigate();
 
   const [selectedTargetIds, setSelectedTargetIds] = useState([]);
   const [selectAll, setSelectAll] = useState(false);

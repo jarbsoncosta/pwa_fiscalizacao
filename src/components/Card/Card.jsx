@@ -7,7 +7,7 @@ const colorMap = {
   yellow: styles.yellow,
   gray: styles.gray,
   sky:styles.sky
-};
+  };
 
 export default function Card({ value, label, color, icon }) {
   return (

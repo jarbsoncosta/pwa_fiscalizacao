@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { LuUsers } from "react-icons/lu";
 import { IoIosList, IoMdPersonAdd } from "react-icons/io";
 import { CiViewList } from "react-icons/ci";
@@ -11,6 +11,8 @@ import { Modal } from "../../components/Modal/Modal";
 import { ButtonComponent } from "../../components/Button/Button";
 import { AddUsersToTeamForm } from "./components/AddUsersToTeamForm/AddUsersToTeamForm";
 import { DataContext } from "../../context/DataContext"; // ✅ Importe o contexto
+import { FiEye } from "react-icons/fi";
+import { formatCNPJ } from "../../utils/formatDate";
 
 export default function TeamPage() {
   const { id } = useParams();
@@ -38,7 +40,7 @@ export default function TeamPage() {
   useEffect(() => {
     const loadTeam = async () => {
       if (!id) return;
-  
+
       setLoading(true);
       try {
         const teamData = await fetchTeamById(id);
@@ -49,7 +51,7 @@ export default function TeamPage() {
         }
       } catch (err) {
         console.warn("Erro ao carregar equipe online e offline:", err);
-  
+
         try {
           const offlineTeam = await carregarTeamDetalhado(id);
           if (offlineTeam) {
@@ -59,16 +61,16 @@ export default function TeamPage() {
         } catch (dbErr) {
           console.error("Erro ao ler do IndexedDB:", dbErr);
         }
-  
+
         setError("Equipe não encontrada, mesmo offline.");
       } finally {
         setLoading(false);
       }
     };
-  
+
     loadTeam();
   }, [id]); // 👈 só depende do id
-  
+
 
   if (loading) {
     return <p className={styles.loading}>Carregando equipe...</p>;
@@ -122,9 +124,8 @@ export default function TeamPage() {
           <div>
             <p className={styles.label}>Status:</p>
             <span
-              className={`${styles.statusBadge} ${
-                team.status === "ATIVO" ? styles.bgGreen : styles.bgRed
-              }`}
+              className={`${styles.statusBadge} ${team.status === "ATIVO" ? styles.bgGreen : styles.bgRed
+                }`}
             >
               {team.status === "ATIVO" ? "ATIVO" : "INATIVO"}
             </span>
@@ -185,13 +186,12 @@ export default function TeamPage() {
                     </td>
                     <td>
                       <span
-                        className={`${styles.statusBadge} ${
-                          user.role === "USER"
-                            ? styles.bgBlue100
-                            : user.role === "SUPERVISOR"
+                        className={`${styles.statusBadge} ${user.role === "USER"
+                          ? styles.bgBlue100
+                          : user.role === "SUPERVISOR"
                             ? styles.bgPurple100
                             : styles.bgGray100
-                        }`}
+                          }`}
                       >
                         {user.role}
                       </span>
@@ -219,9 +219,9 @@ export default function TeamPage() {
               <tr>
                 <th>ART</th>
                 <th>Tipo ART</th>
-                <th>Profissional</th>
                 <th>Empresa</th>
-                <th>CNPJ</th>
+                <th>Proprietário</th>
+                <th>Profissional</th>
                 <th>Endereço</th>
                 <th>Status</th>
                 <th>Ação</th>
@@ -232,32 +232,41 @@ export default function TeamPage() {
                 <tr key={index}>
                   <td style={{ fontWeight: "500" }}>{target.numeroArt}</td>
                   <td>{target.tipoArt}</td>
-                  <td>{target.nomeProfissional}</td>
-                  <td>{target.empresa}</td>
-                  <td>{target.cnpj}</td>
+                  <td>
+                    <div style={{ fontWeight: 500 }}>{target?.empresa}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{formatCNPJ(target?.cnpj)}</div>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 500 }}>{target.nomeProprietario}</div>
+                    {/* <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{formatCNPJ(target?.cnpj)}</div> */}
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 500 }}>{target.nomeProfissional}</div>
+                    {/* <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{formatCNPJ(target?.cnpj)}</div> */}
+                  </td>
                   <td>{target.enderecoObra}</td>
                   <td>
                     <span
-                      className={`${styles.statusBadge} ${
-                        target.status === "CONCLUÍDA"
-                          ? styles.bgGreen
-                          : target.status === "EM ANDAMENTO"
+                      className={`${styles.statusBadge} ${target.status === "CONCLUÍDA"
+                        ? styles.bgGreen
+                        : target.status === "EM ANDAMENTO"
                           ? styles.bgYellow
                           : target.status === "NÃO INICIADA"
-                          ? styles.bgBlue
-                          : styles.bgGray
-                      }`}
+                            ? styles.bgBlue
+                            : styles.bgGray
+                        }`}
                     >
                       {target.status}
                     </span>
                   </td>
                   <td>
-                    <button
-                      className="p-1 text-blue-600 hover:bg-blue-100 rounded transition"
-                      aria-label="Ver detalhes"
+                    <NavLink to={`/view/target/${target.id}`}
+                      /* onClick={() => handleView(target)} */
+                      className={styles.actionButton}
+                      title="Ver detalhes"
                     >
-                      <CiViewList size={20} />
-                    </button>
+                      <FiEye size={16} />
+                    </NavLink>
                   </td>
                 </tr>
               ))}

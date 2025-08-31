@@ -7,21 +7,55 @@ import MapaPage from './pages/Mapa/Mapa'
 import DefaultLayout from './components/DefaultLayout/DefaultLayout'
 import TargetsPage from './pages/Fiscalizacoes/Fiscalizacoes'
 import TargetDetailPage from './pages/TargetDetailPage/TargetDetailPage'
+import ProtectedRoute from './Router/ProtectedRoute'
+import UnauthorizedPage from './pages/UnauthorizedPage/UnauthorizedPage'
 
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/view/unauthorized" element={<UnauthorizedPage />} />
       <Route element={<DefaultLayout />}>
-        <Route path="/view/dashboard" element={<Dashboard />} />
-        <Route path="/view/equipe/:id" element={<TeamPage />} />
-        <Route path="/view/meus_alvos" element={<MinhasFiscalizacoesPage />} />
-        <Route path="/view/meus_alvos/mapa" element={<MapaPage />} />
-        <Route path="/view/alvos" element={<TargetsPage />} />
-        <Route path="/view/target/:id" element={<TargetDetailPage />} />
+       
+        <Route path="/view/dashboard" element={
+          <ProtectedRoute allowedRoles={["ADMIN"]} >
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/view/equipe/:id" element={
+          <ProtectedRoute >
+            <TeamPage />
+          </ProtectedRoute>}
+        />
+        <Route path="/view/meus_alvos" element={
+          <ProtectedRoute >
+            <MinhasFiscalizacoesPage />
+          </ProtectedRoute>} />
+
+        <Route path="/view/meus_alvos/mapa" element={
+          <ProtectedRoute >
+            <MapaPage />
+          </ProtectedRoute>}
+        />
+         <Route path="/view/alvos/mapa" element={
+          <ProtectedRoute allowedRoles={["ADMIN"]} >
+            <MapaPage />
+          </ProtectedRoute>}
+        />
+
+        <Route path="/view/alvos" element={
+          <ProtectedRoute allowedRoles={["ADMIN"]} >
+            <TargetsPage />
+          </ProtectedRoute>}
+        />
+        <Route path="/view/target/:id" element={
+          <ProtectedRoute  >
+            <TargetDetailPage />
+          </ProtectedRoute>}
+        />
       </Route>
-      {/* <Route path="/registros" element={<RegistrosLocais />} /> */}
+    
     </Routes>
   )
 }

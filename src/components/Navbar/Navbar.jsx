@@ -1,6 +1,6 @@
 import { FaBars, FaHome, FaList, FaTachometerAlt, FaTimes, FaUserCircle, FaUsers } from "react-icons/fa";
 import { RiMapPinUserFill } from "react-icons/ri";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useContext, useState } from "react";
 import styles from "./Navbar.module.css";
@@ -14,8 +14,6 @@ export default function Navbar() {
   console.log(user)
   const [menuOpen, setMenuOpen] = useState(false);
   const { targets } = useContext(DataContext);
-  const navigate = useNavigate();
-
   const handleOpenMap = () => {
     sessionStorage.setItem("userTargets", JSON.stringify(targets));
     window.location.href = "/view/alvos/mapa"

@@ -55,6 +55,7 @@
   
   .gray {
     background-color: #dadada;
+    color: #4b5563
   }
   
   .gray:hover:not(:disabled) {

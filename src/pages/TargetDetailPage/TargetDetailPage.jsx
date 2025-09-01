@@ -1,11 +1,13 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import styles from "./TargetDetailPage.module.css";
 import { DataContext } from "../../context/DataContext";
 import { ButtonComponent } from "../../components/Button/Button";
 import { FiMapPin } from "react-icons/fi";
 import { formatCNPJ, formatDateBR } from "../../utils/formatDate";
+import { FiscalizacaoForm } from "../../components/FiscalizacaoForm/FiscalizacaoForm";
+import { Modal } from "../../components/Modal/Modal";
 
 export default function TargetDetailPage() {
   const { id } = useParams();
@@ -14,6 +16,7 @@ export default function TargetDetailPage() {
   const { targets, loading: targetsLoading } = useContext(DataContext);
   const [target, setTarget] = useState(null);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   console.log(target, "Target")
 
@@ -99,13 +102,12 @@ export default function TargetDetailPage() {
           <div className={styles.info}>
             <label>Status</label>
             <span
-              className={`${styles.statusBadge} ${
-                target.status === "CONCLUÍDA"
-                  ? styles.bgGreen
-                  : target.status === "EM ANDAMENTO"
+              className={`${styles.statusBadge} ${target.status === "CONCLUÍDA"
+                ? styles.bgGreen
+                : target.status === "EM ANDAMENTO"
                   ? styles.bgYellow
                   : styles.bgGray
-              }`}
+                }`}
             >
               {target.status}
             </span>
@@ -119,6 +121,8 @@ export default function TargetDetailPage() {
               Ver no Mapa
             </ButtonComponent>
           </div>
+          <button onClick={() => setIsModalOpen(true)} >Fiscalizar </button>
+          <Link to="/view/alvos_pendentes">Alvos pendentes </Link>
         </div>
       </div>
 
@@ -169,7 +173,7 @@ export default function TargetDetailPage() {
                         <span className={styles.downloadIcon}> ⬇️ </span>
                         Baixar Arquivo
                       </a>
-                     {/*  <span className={styles.fileName}>{fileName}</span> */}
+                      {/*  <span className={styles.fileName}>{fileName}</span> */}
                     </div>
                   );
                 })
@@ -180,6 +184,9 @@ export default function TargetDetailPage() {
           </div>
         </div>
       </div>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <FiscalizacaoForm onClose={() => setIsModalOpen(false)} targetId={id} />
+      </Modal>
     </div>
   );
 }

@@ -1,110 +1,77 @@
+// src/utils/idb.js
 import { openDB } from "idb";
 
 const DB_NAME = "fiscalizacao-db";
-const DB_VERSION = 4;
+const DB_VERSION = 6; // Incrementado
 
-// Função para conectar/criar o banco de dados
 async function getDB() {
   return openDB(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      // Cria store para usuários, se não existir
       if (!db.objectStoreNames.contains("users")) {
         db.createObjectStore("users", { keyPath: "id" });
       }
-
-      // Cria store para targets, se não existir
       if (!db.objectStoreNames.contains("targets")) {
         db.createObjectStore("targets", { keyPath: "id" });
       }
-      // ✅ Adicione o store para 'teams'
       if (!db.objectStoreNames.contains("teams")) {
         db.createObjectStore("teams", { keyPath: "id" });
       }
-       // ✅ Novo store para equipes com detalhes
-       if (!db.objectStoreNames.contains("teams_detalhados")) {
+      if (!db.objectStoreNames.contains("teams_detalhados")) {
         db.createObjectStore("teams_detalhados", { keyPath: "id" });
+      }
+
+      // ✅ Novo: store para fiscalizações offline
+      if (!db.objectStoreNames.contains("fiscalizacoes")) {
+        const store = db.createObjectStore("fiscalizacoes", { keyPath: "targetId" });
+        store.createIndex("pendingSync", "pendingSync"); // Para sincronizar depois
       }
     },
   });
 }
 
-// --- Funções para Usuários ---
-
-/**
- * Salva um ou múltiplos usuários no IndexedDB
- * @param {Object|Object[]} users - Objeto de usuário ou array de usuários
- */
+// --- Funções existentes (mantidas) ---
 export async function salvarUserData(users) {
   const arr = Array.isArray(users) ? users : [users];
   const db = await getDB();
   const tx = db.transaction("users", "readwrite");
   const store = tx.objectStore("users");
-  for (const u of arr) {
-    await store.put(u);
-  }
+  for (const u of arr) await store.put(u);
   await tx.done;
 }
 
-/**
- * Salva um ou múltiplos teams no IndexedDB
- * @param {Object|Object[]} teams - Objeto de usuário ou array de usuários
- */
 export async function salvarTeamData(teams) {
   const arr = Array.isArray(teams) ? teams : [teams];
   const db = await getDB();
   const tx = db.transaction("teams", "readwrite");
   const store = tx.objectStore("teams");
-  for (const u of arr) {
-    await store.put(u);
-  }
+  for (const u of arr) await store.put(u);
   await tx.done;
 }
-/**
- * Carrega todos os teams salvos no IndexedDB
- * @returns {Promise<Object[]>}
- */
+
 export async function carregarTodosTeams() {
   const db = await getDB();
   return db.getAll("teams");
 }
 
-/**
- * Carrega todos os usuários salvos no IndexedDB
- * @returns {Promise<Object[]>}
- */
 export async function carregarTodosUsers() {
   const db = await getDB();
   return db.getAll("users");
 }
 
-// --- Funções para Targets ---
-
-/**
- * Salva uma lista de targets no IndexedDB
- * @param {Object[]} targets - Array de alvos/fiscalizações
- */
 export async function salvarTargets(targets) {
+  const arr = Array.isArray(targets) ? targets : [targets];
   const db = await getDB();
   const tx = db.transaction("targets", "readwrite");
   const store = tx.objectStore("targets");
-  for (const t of targets) {
-    await store.put(t);
-  }
+  for (const t of arr) await store.put(t);
   await tx.done;
 }
 
-/**
- * Carrega todos os targets salvos no IndexedDB
- * @returns {Promise<Object[]>}
- */
 export async function carregarTodosTargets() {
   const db = await getDB();
   return db.getAll("targets");
 }
 
-/**
- * Limpa todos os targets do IndexedDB (opcional)
- */
 export async function limparTargets() {
   const db = await getDB();
   const tx = db.transaction("targets", "readwrite");
@@ -112,54 +79,69 @@ export async function limparTargets() {
   await tx.done;
 }
 
-
-
-/**
- * Salva uma equipe específica (com membros e alvos) no IndexedDB
- * @param {Object} team - Equipe com users, targets, etc.
- */
 export async function salvarTeamDetalhado(team) {
-  if (!team || !team.id) {
-    console.warn("❌ Não foi possível salvar equipe: falta ID", team);
-    return;
-  }
-
-  try {
-    const db = await getDB();
-    const tx = db.transaction("teams_detalhados", "readwrite");
-    const store = tx.objectStore("teams_detalhados");
-
-    await store.put(team); // ✅ Sem segundo parâmetro
-
-    console.log("✅ Equipe salva no IndexedDB:", team.id, team.name);
-  } catch (error) {
-    console.error("❌ Erro ao salvar equipe no IndexedDB:", error);
-  }
+  if (!team || !team.id) return;
+  const db = await getDB();
+  const tx = db.transaction("teams_detalhados", "readwrite");
+  await tx.objectStore("teams_detalhados").put(team);
 }
 
-/**
- * Carrega uma equipe específica do IndexedDB
- * @param {number} teamId - ID da equipe
- * @returns {Promise<Object|null>}
- */
 export async function carregarTeamDetalhado(teamId) {
-  try {
-    const db = await getDB();
-    const team = await db.get("teams_detalhados", Number(teamId));
-    console.log("🔍 Carregado do IndexedDB:", team ? team : "não encontrado", "ID:", teamId);
-    return team;
-  } catch (error) {
-    console.error("❌ Erro ao carregar equipe do IndexedDB:", error);
-    return null;
-  }
+  const db = await getDB();
+  return db.get("teams_detalhados", Number(teamId));
 }
 
-/**
- * Limpa todas as equipes detalhadas (opcional)
- */
 export async function limparTeamDetalhado() {
   const db = await getDB();
   const tx = db.transaction("teams_detalhados", "readwrite");
   await tx.objectStore("teams_detalhados").clear();
+  await tx.done;
+}
+
+// utils/idb.js
+export async function salvarFiscalizacaoOffline(data) {
+  const db = await getDB();
+
+  // ✅ Processar as fotos ANTES da transação
+  const fotosBlobs = [];
+  for (const file of data.photos) {
+    const arrayBuffer = await file.arrayBuffer();
+    fotosBlobs.push({
+      name: file.name,
+      type: file.type,
+      data: arrayBuffer,
+    });
+  }
+
+  const registro = {
+    targetId: data.targetId,
+    status: data.status,
+    fotos: fotosBlobs,
+    timestamp: Date.now(),
+    pendingSync: true,
+  };
+
+  // ✅ Abre a transação e faz o put imediatamente
+  const tx = db.transaction("fiscalizacoes", "readwrite");
+  const store = tx.objectStore("fiscalizacoes");
+
+  // ✅ put() DENTRO da transação ativa
+  store.put(registro);
+
+  // ✅ Aguarda a transação terminar
+  await tx.done;
+
+  console.log("✅ Fiscalização salva offline:", registro);
+}
+
+export async function carregarFiscalizacoesOffline() {
+  const db = await getDB();
+  return db.getAll("fiscalizacoes");
+}
+
+export async function removerFiscalizacaoOffline(targetId) {
+  const db = await getDB();
+  const tx = db.transaction("fiscalizacoes", "readwrite");
+  await tx.objectStore("fiscalizacoes").delete(targetId);
   await tx.done;
 }

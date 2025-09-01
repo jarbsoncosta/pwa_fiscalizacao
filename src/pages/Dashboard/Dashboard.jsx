@@ -140,7 +140,7 @@ export default function Dashboard() {
             type="text"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="72624476"
+            placeholder="Busque por membro ou equipe"
             className={styles.filterInput}
           />
         </div>

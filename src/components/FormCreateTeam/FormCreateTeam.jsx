@@ -41,7 +41,7 @@ export function FormCreateTeam({ onTeamCreated, onClose }) {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Nova Equipe</h2>
+      <h2 className={styles.title}>Criar Nova Equipe</h2>
 
       {error && <div className={styles.error}>{error}</div>}
 
